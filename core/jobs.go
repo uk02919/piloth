@@ -36,7 +36,7 @@ func peekJob() (job *Job, err error) {
 	defer TRA(CE())
 	var bytes []byte
 	dir := processDir("")
-	files, err := ls(dir)
+	files, err := lsJobs(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func addJob(job Job) error {
 }
 
 // ls files in a folder by date (oldest modified time first)
-func ls(dirname string) ([]os.FileInfo, error) {
+func lsJobs(dirname string) ([]os.FileInfo, error) {
 	defer TRA(CE())
 	// read files from folder
 	files, err := ioutil.ReadDir(dirname)

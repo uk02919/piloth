@@ -36,7 +36,7 @@ type Pilot struct {
 
 type PilotOptions struct {
 	UseHwId            bool
-	Logs               bool
+	Telemetry          bool
 	Tracing            bool
 	Info               *ctl.HostInfo
 	CPU                bool
@@ -106,16 +106,16 @@ func NewPilot(options PilotOptions) (*Pilot, error) {
 func (p *Pilot) Start() {
 	defer TRA(CE())
 	// starts the collector service
-	if p.options.Logs {
+	if p.options.Telemetry {
 		// creates a new SysLog collector
-		collector, err := NewCollector("0.0.0.0", p.cfg.getSyslogPort())
+		collector, err := NewTelemCtl()
 		if err != nil {
-			ErrorLogger.Printf("cannot create pilot syslog collector: %s\n", err)
+			ErrorLogger.Printf("cannot create pilot telemetry loop: %s\n", err)
 			os.Exit(1)
 		}
-		collector.Start()
+		collector.Start(p.ctl)
 	} else {
-		InfoLogger.Printf("syslog collector has been disabled\n")
+		InfoLogger.Printf("telemetry loop has been disabled\n")
 	}
 	// check artisan cli is installed
 	if !commandExists("art") {

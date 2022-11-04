@@ -19,7 +19,7 @@ import (
 func getEvents(max int) (*ctl.Events, error) {
 	defer TRA(CE())
 	dir := submitDir("")
-	files, err := ls(dir)
+	files, err := lsJobs(dir)
 	if err != nil {
 		return nil, err
 	}

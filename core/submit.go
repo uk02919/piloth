@@ -64,7 +64,7 @@ func peekJobResult() (jobResult *types.JobResult, err error) {
 	defer TRA(CE())
 	var bytes []byte
 	dir := submitDir("")
-	files, err := ls(dir)
+	files, err := lsJobs(dir)
 	if err != nil {
 		return nil, err
 	}

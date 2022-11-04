@@ -24,7 +24,7 @@ func TestStart(t *testing.T) {
 	// creates pilot instance
 	p, err := pilotCore.NewPilot(pilotCore.PilotOptions{
 		UseHwId:            false,
-		Logs:               false,
+		Telemetry:          true,
 		Tracing:            false,
 		Info:               hostInfo,
 		CPU:                false,

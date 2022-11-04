@@ -21,7 +21,7 @@ type LaunchCmd struct {
 	cmd                *cobra.Command
 	useHwId            bool   // use hardware uuid to identify device (instead of primary mac address)
 	tracing            bool   // enables tracing
-	logCollector       bool   // enables log collector
+	telemetry          bool   // enables telemetry file upload
 	cpu                *bool  // enables cpu profiling
 	mem                *bool  // enables memory profiling
 	insecureSkipVerify bool   // if true, crypto/tls accepts any certificate presented by the server and any host name in that certificate. In this mode, TLS is susceptible to machine-in-the-middle attacks unless custom verification is used.
@@ -39,7 +39,7 @@ func NewLaunchCmd() *LaunchCmd {
 	}
 	c.cmd.Flags().BoolVarP(&c.useHwId, "hw-id", "w", false, "use hardware uuid to identify device(instead of primary mac address)")
 	c.cmd.Flags().BoolVarP(&c.tracing, "trace", "t", false, "enables tracing")
-	c.cmd.Flags().BoolVarP(&c.logCollector, "syslog-collector", "s", false, "enables the syslog collector")
+	c.cmd.Flags().BoolVarP(&c.telemetry, "telemetry", "m", false, "enables the upload of telemetry information to pilot control")
 	c.cpu = c.cmd.Flags().Bool("cpu", false, "enables cpu profiling only; cannot profile memory")
 	c.mem = c.cmd.Flags().Bool("mem", false, "enables memory profiling only; cannot profile cpu")
 	c.insecureSkipVerify = *c.cmd.Flags().Bool("insecureSkipVerify", false, "disables verification of certificates presented by the server and host name in that certificate; in this mode, TLS is susceptible to machine-in-the-middle attacks unless custom verification is used.")
@@ -59,7 +59,7 @@ func (c *LaunchCmd) Run(_ *cobra.Command, _ []string) {
 	// creates pilot instance
 	p, err := pilotCore.NewPilot(pilotCore.PilotOptions{
 		UseHwId:            c.useHwId,
-		Logs:               c.logCollector,
+		Telemetry:          c.telemetry,
 		Tracing:            c.tracing,
 		Info:               hostInfo,
 		CPU:                *c.cpu,

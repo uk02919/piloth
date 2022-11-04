@@ -9,9 +9,10 @@
 package core
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"southwinds.dev/artisan/core"
 	ctlCore "southwinds.dev/pilotctl/core"
@@ -102,7 +103,7 @@ func (r *PilotCtl) Register() (*ctl.RegistrationResponse, error) {
 		return nil, fmt.Errorf("the request failed with error: %d - %s", resp.StatusCode, resp.Status)
 	}
 	var result ctl.RegistrationResponse
-	op, err := ioutil.ReadAll(resp.Body)
+	op, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(op, &result)
 	if err != nil {
 		return nil, err
@@ -136,11 +137,6 @@ func (r *PilotCtl) Ping() (ctl.PingResponse, error) {
 			// return the error
 			return ctl.PingResponse{}, err
 		}
-		// if there are events to send
-		if events != nil && len(events.Events) > 0 {
-			// send syslog events in the ping request
-			payload = &ctl.PingRequest{Events: events}
-		}
 	}
 	uri := fmt.Sprintf("%s/ping", r.cfg.BaseURI)
 	resp, err := r.client.Post(uri, payload, r.addToken)
@@ -165,7 +161,7 @@ func (r *PilotCtl) Ping() (ctl.PingResponse, error) {
 		}
 	}
 	// get the commands to execute from the response body
-	bytes, err := ioutil.ReadAll(resp.Body)
+	bytes, err := io.ReadAll(resp.Body)
 	var pingResponse ctl.PingResponse
 	err = json.Unmarshal(bytes, &pingResponse)
 	if err != nil {
@@ -199,4 +195,37 @@ func (r *PilotCtl) SubmitCveReport(report []byte) error {
 		return fmt.Errorf("cannot submit CVE report: call to the remote service failed, %d - %s", resp.StatusCode, resp.Status)
 	}
 	return nil
+}
+
+func (r *PilotCtl) SubmitTelemetry(channel string, content []byte, telemType string) (*ConnResult, error) {
+	uri := fmt.Sprintf("%s/%s/%s", r.cfg.BaseURI, telemType, channel)
+	req, err := http.NewRequest(http.MethodPost, uri, bytes.NewReader(content))
+	if err != nil {
+		return nil, err
+	}
+	// add an authentication token to the request
+	req.Header.Set("Authorization", newToken(r.host.HostUUID, r.host.HostIP, r.host.HostName))
+	resp, err := r.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot submit metrics data: %s", err)
+	}
+	if resp.StatusCode > 299 {
+		return nil, fmt.Errorf("cannot submit metrics data: %d, %s", resp.StatusCode, resp.Status)
+	}
+	resultBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read response: %s", err)
+	}
+	result := new(ConnResult)
+	err = json.Unmarshal(resultBytes, result)
+	if err != nil {
+		return nil, fmt.Errorf("cannot unmarshal result: %s", err)
+	}
+	return result, nil
+}
+
+type ConnResult struct {
+	Error             string `json:"e"`
+	TotalEntries      int    `json:"t"`
+	SuccessfulEntries int    `json:"s"`
 }
