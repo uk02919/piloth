@@ -77,7 +77,7 @@ func (p *Processor) run() {
 			time.Sleep(waitTime)
 		} else {
 			count = 0
-			if err = os.Remove(p.path); err != nil {
+			if err = os.Remove(file); err != nil {
 				log.Printf("ERROR: cannot delete %s file after submition: %s\n", p.telemType, err)
 			}
 		}
