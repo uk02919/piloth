@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -110,8 +111,7 @@ func activate(options PilotOptions) {
 	// before doing anything, verify activation key
 	akInfo, err := LoadActivationKey()
 	if err != nil {
-		fmt.Errorf("cannot start pilot: %s", err)
-		os.Exit(1)
+		log.Fatalf("cannot start pilot: %s", err)
 	}
 	// set the activation
 	A = akInfo
