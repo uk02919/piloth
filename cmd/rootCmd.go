@@ -11,7 +11,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"southwinds.dev/artisan/core"
+	"southwinds.dev/piloth/core"
 )
 
 type RootCmd struct {
