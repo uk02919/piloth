@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"southwinds.dev/artisan/core"
 )
 
 type TelemCtl struct {
@@ -14,6 +15,7 @@ type TelemCtl struct {
 }
 
 func NewTelemCtl() (*TelemCtl, error) {
+	var err error
 	path := os.Getenv("PILOT_CTL_TELEM_PATH")
 	if len(path) == 0 {
 		log.Printf("missing PILOT_CTL_TELEM_PATH variable, reading telemetry data from default path at ./telemetry\n")
@@ -22,20 +24,33 @@ func NewTelemCtl() (*TelemCtl, error) {
 		log.Printf("reading telemetry data from %s\n", path)
 	}
 	path, _ = filepath.Abs(path)
-	logsPath := filepath.Join(path, "logs")
-	metricsPath := filepath.Join(path, "metrics")
 
-	logsChannel, err := ls(logsPath, true)
-	if err != nil {
-		return nil, err
+	// get the logs channels
+	logsPath := filepath.Join(path, "logs")
+	var logsChannels []string
+	if _, err = os.Stat(logsPath); os.IsNotExist(err) {
+		core.InfoLogger.Printf("logs path %s not found, skipping logs publication")
+	} else {
+		logsChannels, err = ls(logsPath, true)
+		if err != nil {
+			return nil, err
+		}
 	}
-	metricsChannel, err := ls(metricsPath, true)
-	if err != nil {
-		return nil, err
+	// get the metrics channels
+	metricsPath := filepath.Join(path, "metrics")
+	var metricsChannels []string
+	if _, err = os.Stat(metricsPath); os.IsNotExist(err) {
+		core.InfoLogger.Printf("metrics path %s not found, skipping metrics publication")
+	} else {
+		metricsChannels, err = ls(metricsPath, true)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	return &TelemCtl{
-		logsChannels:    logsChannel,
-		metricsChannels: metricsChannel,
+		logsChannels:    logsChannels,
+		metricsChannels: metricsChannels,
 	}, nil
 }
 
