@@ -6,6 +6,7 @@ replace (
 	southwinds.dev/artisan => ../artisan
 	southwinds.dev/http => ../http
 	southwinds.dev/interlink-client => ../interlink-client
+	southwinds.dev/os => ../os
 	southwinds.dev/pilotctl => ../pilotctl
 )
 
@@ -159,5 +160,5 @@ require (
 	moul.io/http2curl v1.0.0 // indirect
 	southwinds.dev/http v0.0.0-20220831074207-face05fed3a2 // indirect
 	southwinds.dev/interlink-client v0.0.0-00010101000000-000000000000 // indirect
-	southwinds.dev/os v0.0.0-20220901065504-762d072c036a // indirect
+	southwinds.dev/os v0.0.0-00010101000000-000000000000 // indirect
 )
