@@ -107,7 +107,7 @@ func (p *Pilot) Start() {
 	defer TRA(CE())
 	// starts the collector service
 	if p.options.Telemetry {
-		// creates a new SysLog collector
+		// creates a new telemetry collector
 		collector, err := NewTelemCtl()
 		if err != nil {
 			ErrorLogger.Printf("cannot create pilot telemetry loop: %s\n", err)

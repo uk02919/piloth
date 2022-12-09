@@ -94,14 +94,21 @@ func getFiles(path string) ([]os.DirEntry, error) {
 	if err != nil {
 		fmt.Errorf("cannot read path: %s", err)
 	}
+	// filter hidden files
+	var files []os.DirEntry
+	for _, dir := range dirs {
+		ff, _ := dir.Info()
+		if ff.Name()[0] != '.' {
+			files = append(files, dir)
+		}
+	}
 	// sort the directory entries by modification time
-	sort.SliceStable(dirs, func(i, j int) bool {
-		iInfo, _ := dirs[i].Info()
-		jInfo, _ := dirs[j].Info()
+	sort.SliceStable(files, func(i, j int) bool {
+		iInfo, _ := files[i].Info()
+		jInfo, _ := files[j].Info()
 		return iInfo.ModTime().Before(jInfo.ModTime())
-		// return dirs[i].Name() < dirs[j].Name()
 	})
-	return dirs, err
+	return files, err
 }
 
 // backoffTime exponentially increase backoff time until reaching 1 hour
