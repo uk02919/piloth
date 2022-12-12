@@ -208,7 +208,7 @@ func run(data interface{}) (string, error) {
 	// if running in verbose mode
 	if cmd.Verbose {
 		// add ARTISAN_DEBUG to execution environment
-		cmdEnv.Vars["ARTISAN_DEBUG"] = "true"
+		cmdEnv.Vars()["ARTISAN_DEBUG"] = "true"
 	}
 	// create the command statement to run
 	cmdString := fmt.Sprintf("art %s -u %s:%s %s %s", artCmd, cmd.User, cmd.Pwd, cmd.Package, cmd.Function)
